@@ -193,10 +193,6 @@ public class Test {
 
 多种数据类型混合运算最终的结果是最大容量对应的类型，除byte char short会变成int
 
-#### 4 数组
-
-
-
 ### 运算符
 
 a++ 先执行表达式再自增
@@ -492,3 +488,155 @@ public class Test {
 }
 ```
 
+```java
+import java.util.Scanner;
+public class Test {
+    public static void main(String[] args) {
+        Scanner obj = new Scanner(System.in);
+        int n = obj.nextInt();
+        System.out.println(fun(n));
+    }
+    //求1-n的阶乘   5*4*3*2*1
+   public static int fun(int n) {
+        if (n == 1) {
+            return n;
+        }
+        return n*fun(n-1);
+   }
+}
+```
+
+### 2 面向对象
+
+#### 类、对象介绍
+
+三大特征：封装，继承，多态
+
+对象（实例）
+
+![image-20230408052539975](java基础.assets/image-20230408052539975.png)
+
+![image-20230408055955837](java基础.assets/image-20230408055955837.png)
+
+![image-20230408080842226](java基础.assets/image-20230408080842226.png)
+
+##### 构造方法
+
+1.修饰符统一写public
+
+2.构造方法名和类名必须一致
+
+3.构造方法没有返回值类型
+
+当一个类中没有提供任何构造方法，系统默认提供一个无参数的构造方法。缺省构造器
+
+当一个类中手动提供了构造方法，系统不再提供无参构造方法。
+
+```java
+public class Student {
+    int number;
+    String name;
+    int age;
+    Student() {}
+    Student(int nu,String na,int ag) {
+        nu = number;
+        na = name;
+        ag =  age;
+    }
+}
+import java.util.Scanner;
+public class Test {
+    public static void main(String[] args) {
+        Student s1 = new Student(1,"2",3);
+        
+    }
+
+}
+```
+
+##### static
+
+静态变量，可以通过类名访问
+
+```java
+public class Student {
+    private int number;
+    private String name;
+    private int age;
+    static String kk = "信了";    //静态变量，类级别的
+    Student() {}
+    Student(int nu,String na,int ag) {
+        nu = number;
+        na = name;
+        ag =  age;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+import java.util.Scanner;
+public class Test {
+    public static void main(String[] args) {
+        Student s1 = new Student(1,"2",3);
+        System.out.println(Student.kk);
+    }
+
+}
+```
+
+静态方法
+
+方法中直接访问了实例变量，该方法一定是实例方法
+
+如果是工具类，该工具类当中的方法一定是静态的
+
+静态代码块
+
+```java
+import java.util.Scanner;
+public class Test {
+    //静态代码块在类加载时执行，并且在main方法执行之前执行
+    //静态代码块可以自上至下顺序执行
+    //作用：类加载时记录类加载时的日志信息，写到静态代码块中。
+    //静态代码块和静态变量都在类加载时执行，时间相同，只能靠代码顺序来决定谁先谁后
+    
+    static {    //一个类中可以有多个静态代码块
+        System.out.println("A");
+        //System.out.println(a);    错误，非法前向引用
+    }
+    //static int a = 5;
+    static {    //一个类中可以有多个静态代码块
+        System.out.println("b");
+    }
+    public static void main(String[] args) {
+        System.out.println("main");
+
+    }
+    static {    //一个类中可以有多个静态代码块
+        System.out.println("c");
+    }
+}
+```
+
+##### 实力语句块
