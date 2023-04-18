@@ -9,5 +9,17 @@ public class IntegerTest01 {
         System.out.println(r);
         Integer x = 100;//自动装箱
         int y = x;//自动拆箱
+        //java将-128~127之间包装对象放到整数型常量池了
+        Integer a = 128;
+        Integer b = 128;
+        System.out.println(a == b); //false
+        Integer aa = 127;
+        Integer bb = 127;
+        System.out.println(aa == bb);   //true
+        int ret = Integer.parseInt("123");
+        double ret2 = Double.parseDouble("3.14");
+        String bin = Integer.toBinaryString(3);
+        String hex = Integer.toHexString(19);
+
     }
 }

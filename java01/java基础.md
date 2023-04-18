@@ -1660,7 +1660,7 @@ stringBuilder是线程不安全的
 
 #### 拆箱装箱
 
-```
+```java
 package com.javase.integer;
 
 public class IntegerTest01 {
@@ -1672,9 +1672,1288 @@ public class IntegerTest01 {
         System.out.println(r);
         Integer x = 100;//自动装箱
         int y = x;//自动拆箱
+        //java将-128~127之间包装对象放到整数型常量池了
+        Integer a = 128;
+        Integer b = 128;
+        System.out.println(a == b); //false
+        Integer aa = 127;
+        Integer bb = 127;
+        System.out.println(aa == bb);   //true
     }
 }
+
 ```
 
 
 
+![image-20230416102058579](java基础.assets/image-20230416102058579.png)
+
+#### 常用方法：
+
+```java
+int ret = Integer.parseInt("123");//String转换为int
+double ret2 = Double.parseDouble("3.14");	//String转换为int
+String bin = Integer.toBinaryString(3);	//十进制转换成2进制
+String hex = Integer.toHexString(19);//十进制转换成16进制
+```
+
+#### String int Integer转换
+
+![image-20230416103403310](java基础.assets/image-20230416103403310.png)
+
+![image-20230416103555722](java基础.assets/image-20230416103555722.png)
+
+![image-20230416103611692](java基础.assets/image-20230416103611692.png)
+
+### java对日期处理
+
+java.util.Date
+
+```java
+package com.javase.date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+public class DateTest01 {
+    public static void main(String[] args) throws ParseException {
+        //获取系统当前时间
+        Date nowTime = new Date();
+        System.out.println(nowTime);    //重写了toString方法
+        //日期格式化
+        /*
+            yyyy 年
+            MM月
+            dd日
+            HH时
+            mm分
+            ss 秒
+            SSS毫秒
+         */
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+        String nowT = sdf.format(nowTime);
+        SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss SSS");
+        String nowT2 = sdf2.format(nowTime);
+        System.out.println(nowT);
+        System.out.println(nowT2);
+        //现在有一个日期字符串string，转换成date类型
+        String time = "2023-04-16 10:47:39 346";
+        //格式要与字符串一样
+        SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+        Date dateTime = sdf3.parse(time);   //注意抛出异常
+        System.out.println(dateTime);
+    }
+}
+```
+
+```java
+package com.javase.date;
+
+public class DateTest02 {
+    public static void main(String[] args) {
+        long nowTimeMillis =  System.currentTimeMillis();   //获取1970.1.1 00:00:00 000到当前系统时间的总毫秒数
+        System.out.println(nowTimeMillis);
+        //统计一个方法执行所耗费的时长
+        long begin = System.currentTimeMillis();
+        print();
+        long end = System.currentTimeMillis();
+        System.out.println("耗费时长"+(end - begin)+"毫秒");
+    }
+    public static void print() {
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("i = " + i);
+        }
+    }
+}
+```
+
+```java
+package com.javase.date;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class DateTest03 {
+    public static void main(String[] args) {
+        //转入1970.1.1 00:00:00 000到现在毫秒数
+        Date time = new Date(1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+        String sTime = sdf.format(time);
+        System.out.println(sTime);
+        //获取昨天的此时时间
+        Date time2 = new Date(System.currentTimeMillis() - 1000*60*60*24);
+        String sTime2 = sdf.format(time2);
+        System.out.println(sTime2);
+    }
+}
+```
+
+### 数字格式化
+
+```java
+package com.javase.number;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+
+public class DecimalFormatTest01 {
+    public static void main(String[] args) {
+        DecimalFormat df = new DecimalFormat("###,###.00"); //保留两个小数位
+        String s = df.format(123456.1);
+        System.out.println(s);
+        DecimalFormat df1 = new DecimalFormat("###,###.##");
+        String s1 = df.format(123456.1);
+        System.out.println(s1);
+        /*
+        BigDecimal处理大数据，财务用的
+         */
+        BigDecimal v1 = new BigDecimal(100);
+        BigDecimal v2 = new BigDecimal(200);
+        BigDecimal v3 = v1.add(v2);
+        System.out.println(v3);
+        
+    }
+}
+```
+
+### Random
+
+```
+package com.javase.random;
+
+import java.util.Random;
+
+public class RandomTest01 {
+    public static void main(String[] args) {
+        //产生一个int型类型范围内的随机数
+        Random random = new Random();
+        int a = random.nextInt();
+        System.out.println(a);
+
+        //[0~100]随机数
+        int b = random.nextInt(101);
+        System.out.println(b);
+
+    }
+}
+```
+
+### 枚举
+
+```java
+package com.javase.enumTest;
+//枚举编译之后也是生成class
+/*
+结果只有两种，使用bool
+结果有多种，可以一枚一枚列举出来，建议使用枚举
+ */
+public class EnumTest {
+    public static void main(String[] args) {
+        Result r = divide(10,0);
+        System.out.println(r == Result.SUSSES? "计算成功" : "计算失败");
+    }
+    public static Result divide(int a,int b) {
+        try {
+            int c = a / b;
+            return Result.SUSSES;
+        } catch(Exception e) {
+            return Result.FAIL;
+        }
+    }
+}
+enum Result {
+    SUSSES,FAIL
+}
+```
+
+### 异常
+
+所有异常都是在运行时发生的
+
+![img](https://img-blog.csdnimg.cn/a492c447aed84693a9cf2c7d576bef58.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAQ29kaW5nQUxpZmU=,size_20,color_FFFFFF,t_70,g_se,x_16)
+
+#### 异常处理
+
+![image-20230416155718091](java基础.assets/image-20230416155718091.png)
+
+```java
+package com.javase.exception;
+//异常在java中以类存在
+
+public class ExceptionTest01 {
+    public static void main(String[] args) {
+        //因为 doSome 有throws ClassNotFoundException,调用时必须预先处理这个异常,否则不能调用
+        try {
+            doSome();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    /*
+    doSome表示方法在执行过程中，有可能会出现ClassNotFoundException异常
+     */
+    public static void doSome() throws ClassNotFoundException{
+
+    }
+
+}
+```
+
+```java
+package com.javase.exception;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class ExceptionTest02 {
+    public static void main(String[] args) {
+        m1();
+    }
+    public static void m1() {
+        System.out.println("m1 begin");
+        try {
+            m2();
+            System.out.println("执行不了");
+        } catch (IOException e) {   //e是new出来的异常对象提供的方法
+            e.printStackTrace();
+            System.out.println("文件不存在了哦！！！");
+        }
+        System.out.println("m1 end");   //继续执行
+    }
+    public static void m2() throws IOException {        //抛FileNotFoundException父类IOException 或Exception都可以
+        System.out.println("m2 begin");
+        m3();
+        System.out.println("m2 end");   //不执行
+    }
+    public static void m3() throws FileNotFoundException {
+        System.out.println("m3 begin");
+        new FileInputStream("C:\\Users\\William\\Desktop\\kkk\\git\\REAE.md");    //构造方法有抛出异常
+        System.out.println("m3 end");   //不执行
+    }
+}
+```
+
+```
+m1 begin
+m2 begin
+m3 begin
+文件不存在了哦！！！
+m1 end
+```
+
+#### 处理方式的选择
+
+如果希望调用者处理，throws，负责try
+
+#### 常用方法
+
+```java
+e.getMessage();
+e.printStackTrace();
+```
+
+#### finally
+
+1.finally子句中的代码是最后执行的，并且一定会执行，有return都会执行，即使try语句块中的代码出现了异常
+
+finally字句必须和try一起出现，不能单独编写
+
+try和finally可以一起出现，不要catch，try不能单独出现
+
+try中即使有return，finally都可以执行
+
+退出jvm与局部在执行
+
+System.exit(0);
+
+2.finally语句使用情形:完成对资源的释放
+
+```java
+package com.javase.exception;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class ExceptionTest05 {
+    public static void main(String[] args) {
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream("");
+            String s = null;
+            s.toString();
+            fileInputStream.close();    //输入流需要关闭，没有finally关闭不了,放在这里可能关闭不了
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            //此处代码一定会执行
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+```
+
+#### 面试题
+
+![image-20230416172006781](java基础.assets/image-20230416172006781.png)
+
+#### final finally finalize区别
+
+![image-20230416172737585](java基础.assets/image-20230416172737585.png)
+
+#### 自定义异常
+
+```java
+package com.javase.exception;
+
+public class ExceptionTest04 {
+    public static void main(String[] args) {
+        MyException e = new MyException("hhh");
+        e.printStackTrace();
+        String me = e.getMessage();
+        System.out.println(me);
+    }
+}
+/*
+    自定义异常类：
+    第一步：编写一个类继承Exception或者RuntimeException
+    第二步：提供两个构造方法，一个无参的，一个带有String参数的
+ */
+class MyException extends Exception{
+    public MyException() {
+
+    }
+    public MyException(String s) {
+        super(s);
+    }
+}
+```
+
+## 11 集合
+
+![image-20230416174802334](java基础.assets/image-20230416174802334.png)
+
+java.util.*;
+
+在java中集合分为两大类：
+
+1.单个方式存储元素，超级父接口:java.util.Collection
+
+2.键值对存储元素，java.util.Map
+
+![img](https://img-blog.csdnimg.cn/7365658cde9840a5aa4cf2dcc0de115b.png)
+
+List特点：此处顺序并不是大小顺序，而是存入数据的先后顺序。有序因为List集合都有下标，下标从0开始，以递增。
+
+Set特点：取出顺序不一定为存入顺序，另外Set集合没有下标。
+
+ArrayList是非线程安全的。
+
+HashSet集合在new的时候，底层实际上new了一个HashMap集合。向HashSet集合中存储元素，实际上是存储到了HashMap的key中了。HashMap集合是一个Hash表数据结构。
+
+SortedSet集合存储元素的特点：由于继承了Set集合，所以他的特点也是无序不可重复，但是放在SortedSet集合中的元素可以自动排序。放到该集合中的元素是自动按照大小顺序排序的。
+
+TreeSet集合底层实际上是TreeMap。TreeSet集合在new的时候，底层实际上new了一个TreeMap集合。向TreeSet集合中存储元素，实际上是存储到了TreeMap的key中了。TreeMap集合是一个二叉树数据结构。
+
+
+![img](https://img-blog.csdnimg.cn/d64de167f8ec4e32b9a03b28995e3c7e.png)
+
+### collection
+
+
+
+![image-20230417074454663](java基础.assets/image-20230417074454663.png)
+
+```java
+package com.iteator.collection;
+//Collection没有泛型之前智能存储object
+//collection常用方法
+import java.util.*;
+
+public class CollectionTest01 {
+    public static void main(String[] args) {
+        Collection c = new ArrayList(); //duotai,接口不能直接new对象
+        //常用方法add
+        c.add(1200);    //自动装箱
+        c.add(3.14);
+        c.add(new Object());
+        c.add(true);
+
+        System.out.println("集合中的元素个数" + c.size());
+        c.clear();
+        c.add(1200);    //自动装箱
+        c.add(3.14);
+        //c里面是否包含某个元素
+        System.out.println(c.contains("1200"));
+        c.remove(3.14);
+        System.out.println(c.isEmpty());
+        //转换成数组
+        Object[] objs = c.toArray();
+        for (int i = 0; i < objs.length; i++) {
+            System.out.println(objs[i]);
+        }
+        /*
+        迭代，在map集合中不能用，只有在Collection集合中才能使用
+         */
+        c.clear();
+        c.add("a");
+        c.add("b");
+        c.add("c");
+        //第一步，获取迭代器
+        Iterator it = c.iterator();
+        /*
+        迭代器方法：
+        boolean hasNext() 如果迭代具有更多元素，则返回 true 。
+        E next() 返回迭代中的下一个元素。
+         */
+        while (it.hasNext()) {
+            System.out.print(it.next()+" ");
+        }
+    }
+}
+```
+
+contains、remove分析(都调用了equals方法)
+
+![image-20230417075738013](java基础.assets/image-20230417075738013.png)
+
+```java
+package com.iteator.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class CollectionTest02 {
+    public static void main(String[] args) {
+        Collection c = new ArrayList();
+
+        String s1 = new String("abd");
+        String s2 = new String("def");
+        c.add(s1);
+        c.add(s2);
+        String x = new String("abd");
+        System.out.println(c.contains(x));  //true
+        c.remove(x);
+        System.out.println(c.size());   //1,删掉了s1
+    }
+}
+```
+
+集合结构发生改变，迭代器一定要更新
+
+```java
+package com.iteator.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+public class CollectionTest03 {
+    public static void main(String[] args) {
+        Collection c = new ArrayList();
+        c.add("a");
+        c.add("b");
+        c.add("c");
+        Iterator it = c.iterator();
+        while (it.hasNext()) {
+            //c.remove(it.next()); 错误，集合结构改变迭代器必须更新
+
+            System.out.println(it.next());
+            it.remove();    //通过迭代器删除可以，自动更新迭代器和集合
+        }
+        System.out.println(c.size());   //0
+    }
+}
+```
+
+#### Collections工具类
+
+```java
+package com.iteator.collection;
+
+import java.util.*;
+
+public class CollectionTest04 {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();  //ArrayList线程不安全
+        //变成线程安全的
+        Collections.synchronizedList(list);
+        //排序,自定义类要实现comparable
+        list.add("b");
+        list.add("c");
+        list.add("a");
+        Collections.sort(list);
+        for (String s : list) {
+            System.out.println(s);
+        }
+        // 对set集合排序，将set转换成list
+        Set<String> set = new HashSet<>();
+        List<String> myList = new ArrayList<>(set);
+
+    }
+}
+```
+
+### List
+
+1.有序可重复
+
+2.特有方法：
+
+- - |  返回  |                             描述                             |
+    | :----: | :----------------------------------------------------------: |
+    |  `E`   |        `get(int index)`  返回此列表中指定位置的元素。        |
+    | `void` | `add(int index, E element)`  将指定的元素插入此列表中的指定位置（可选操作）。 |
+    | `int`  | `indexOf(Object o)`  返回此列表中指定元素的第一次出现的索引，如果此列表不包含元素，则返回-1。 |
+    | `int`  | `lastIndexOf(Object o)`  返回此列表中指定元素的最后一次出现的索引，如果此列表不包含元素，则返回-1。 |
+    |  `E`   | `remove(int index)`  删除该列表中指定位置的元素（可选操作）。 |
+    |  `E`   | `set(int index, E element)`  用指定的元素（可选操作）替换此列表中指定位置的元素。 |
+
+```java
+package com.iteator.collection;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/*
+1.List
+ */
+public class ListTest01 {
+    public static void main(String[] args) {
+        List list = new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        list.add("d");
+        list.add(1,"4654654");
+        Iterator it = list.iterator();
+        while (it.hasNext()) {
+            System.out.println(it.next());
+        }
+        System.out.println(list.get(2));
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
+        }
+        System.out.println(list.indexOf("d"));
+        System.out.println(list.lastIndexOf("c"));
+        list.set(2,"22222");
+    }
+}
+```
+
+#### ArrayList
+
+1.底层采用数组实现，非线程安全的
+
+2.初始化容量是10，扩容1.5倍，尽量给一个预定的初始化
+
+3.优缺点：检索效率高，随机增删元素效率比较低，向数组末尾增加元素，效率较高
+
+4.面试arraylist集合
+
+#### LinkedList
+
+1.底层采用双向链表结构，地址不连续，增删方便，查找不方便
+
+#### Vector
+
+1.底层数组
+
+2.初始化容量10，扩容2倍
+
+### 泛型机制
+
+泛型使集合中存储类型统一
+
+```java
+package com.iteator.genericTest01;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class Generic01 {
+    public static void main(String[] args) {
+        List list =new ArrayList();
+        Cat c = new Cat();
+        Bird bird = new Bird();
+        list.add(c);
+        list.add(bird);
+        Iterator it = list.iterator();
+        while (it.hasNext()) {
+            //没有泛型需要向下转型，通过迭代器取出的是object
+            Object obj = it.next();
+            if(obj instanceof Animal) {
+                Animal a = (Animal)obj;
+                a.move();
+            }
+        }
+        //使用泛型之后集合中的存储类型统一，只能存储Animal类型
+        List<Animal> list1 = new ArrayList<Animal>();
+        list1.add(c);;
+        list1.add(bird);
+        Iterator<Animal> it1 = list1.listIterator();
+        while(it1.hasNext()) {
+            //不需要强制类型转换，it是animal类型
+            it1.next().move();
+        }
+    }
+}
+class Animal {
+    public void move() {
+        System.out.println("动物在移动");
+    }
+}
+class Cat extends Animal {
+    @Override
+    public void move() {
+        System.out.println("猫在移动");
+    }
+}
+class Bird extends Animal {
+    @Override
+    public void move() {
+        System.out.println("鸟在移动");
+    }
+    public void birdFun() {
+        System.out.println("鸟吃重紫");
+    }
+}
+```
+
+#### 类型自动推断
+
+```java
+List<Animal> list1 = new ArrayList<>();
+```
+
+#### 自定义泛型
+
+```java
+package com.iteator.genericTest01;
+
+public class Generic02<泛型标识符随便写> {
+    public void doSome(int o) {
+
+    }
+    public void fun(泛型标识符随便写 p) {
+        System.out.println(p);
+    }
+
+    public static void main(String[] args) {
+        Generic02<String> gt = new Generic02<>();   //不用泛型就是object
+        gt.fun("12");
+    }
+}
+```
+
+### forEach
+
+```java
+package com.iteator.foreach;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class ForEachTest01 {
+    public static void main(String[] args) {
+        int[] arr = {1,2,3,4,5,6};
+        //putong遍历
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i]);
+        }
+        System.out.println();
+        //增强foreach，data是数组中的元素
+        for (int data : arr) {
+            System.out.print(data);
+        }
+        System.out.println();
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        Iterator<Integer> it = list.iterator();
+        for (Integer i: list) {
+            System.out.print(i);
+        }
+    }
+}
+```
+
+### HashSet
+
+无序不可重复
+
+### TreeSet
+
+无序不可重复，但存储元素可以自动按照大小排序
+
+### Map
+
+1.map和collection没有继承关系
+
+2.map集合以key和value键值对方是存储
+
+常用方法
+
+```java
+package com.iteator.map;
+
+import java.util.*;
+
+public class MapTest01 {
+    public static void main(String[] args) {
+        Map<Integer,String> map = new HashMap<>();
+        map.put(1,"张三");
+        map.put(2,"李四");
+        map.put(3,"王五");
+        System.out.println(map.get(2));
+        System.out.println(map.size());
+        //equals实现
+        System.out.println(map.containsKey(1));
+        System.out.println(map.containsValue("张三"));
+        //获取所有valus
+        Collection<String> values = map.values();
+        for(String s : values) {
+            System.out.print(s);
+        }
+        System.out.println();
+        /*map遍历*/
+        map.put(4,"1213");
+        //1.获取所有的key，遍历key，来遍历value
+        Set<Integer> keys = map.keySet();
+        Iterator<Integer> it = keys.iterator();
+        while (it.hasNext()) {
+            Integer key = it.next();
+            String value = map.get(key);
+            System.out.println(key + "=" + value);
+        }
+        for (Integer key : keys) {
+            System.out.println(key + "=" +map.get(key));
+        }
+        //2.Set<Map.Entry<K,V>> entrySet(),建议使用这种方式，效率高
+        Set<Map.Entry<Integer,String>> set = map.entrySet();
+        Iterator<Map.Entry<Integer,String>> it1 = set.iterator();
+        while (it1.hasNext()) {
+            Map.Entry<Integer,String> node = it1.next();
+            Integer key = node.getKey();
+            String value = node.getValue();
+            System.out.println(key + "=" + value);
+        }
+
+        for (Map.Entry<Integer,String> node : set) {
+            System.out.println(node.getKey() + "-->" + node.getValue());
+        }
+    }
+}
+```
+
+### 哈希表
+
+HashMap
+
+1.底层是哈希表/散列表的数据结构
+
+2.哈希表是一个数组和单项链表的结合体，充分发挥它们各自的优点
+
+3.一位数组，每个数组元素是一个单链表
+
+![image-20230417183951617](java基础.assets/image-20230417183951617.png)
+
+重点：放在HashMap集合key部分的元素，以及放在Hashset集合中的元素，需要同时重hashCode 利equals方法。
+HashMap集合的默认初始化容量是16，默认加载团子是0.75这个默认加载因子是当HashMap集合合底层数组的容量达到75%的时候，数组开始扩容。
+重点，记住：HashNap集合初始化容量必须是2的倍数，这也是宫方推荐的，这是因为达到散列均匀，为了提高HashMap集合的存取效率，所必须的。|
+
+![image-20230417191334032](java基础.assets/image-20230417191334032.png)
+
+注意
+
+![image-20230417191434167](java基础.assets/image-20230417191434167.png)
+
+![image-20230417191917913](java基础.assets/image-20230417191917913.png)
+
+![image-20230417192118895](java基础.assets/image-20230417192118895.png)
+
+```java
+package com.iteator.map;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+//
+public class HashMapTest01 {
+    public static void main(String[] args) {
+        Student s1 = new Student("zz");
+        Student s2 = new Student("zz");
+        System.out.println(s1.equals(s2));
+        /*
+        s1的hashcode = 1163157884
+        s2的hashcode = 1956725890
+         */
+        System.out.println("s1的hashcode = " + s1.hashCode());
+        System.out.println("s2的hashcode = " + s2.hashCode());
+        /*
+        s1.equals(s2)结果已经是true了，表示s1和s2是一样的，在hash中放的时候按说只能装一个
+         */
+        Set<Student> students = new HashSet<>();
+        students.add(s1);
+        students.add(s2);
+        System.out.println(students.size());    //结果为2，正常为一，应该重写hashcode()
+    }
+}
+class Student {
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Student(String name) {
+        this.name = name;
+    }
+    public Student() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(name, student.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+}
+```
+
+![image-20230417193313840](java基础.assets/image-20230417193313840.png)
+
+![image-20230417193853058](java基础.assets/image-20230417193853058.png)
+
+### Properties
+
+```java
+package com.iteator.map;
+
+import java.util.Properties;
+
+public class PropertiesTest {
+    public static void main(String[] args) {
+        Properties properties = new Properties();
+        properties.setProperty("a","b");
+        properties.setProperty("1","2");
+        properties.setProperty("3","5");
+        properties.setProperty("4","6");
+        System.out.println(properties.getProperty("a"));
+    }
+}
+```
+
+### TreeSet
+
+1.底层是treemap，treemap底层是一个二叉树
+
+2.放到Treeset中的元素，等同于放到treemap集合中的key部分了
+
+![image-20230417194122358](java基础.assets/image-20230417194122358.png)
+
+```java
+package com.iteator.map;
+
+import java.util.TreeSet;
+
+public class TreeSetTest01 {
+    public static void main(String[] args) {
+        TreeSet<String> treeSet = new TreeSet<>();
+        treeSet.add("b");
+        treeSet.add("a");
+        treeSet.add("c");
+        treeSet.add("r");
+        treeSet.add("d");
+        for (String s : treeSet) {
+            System.out.println(s);  //字符串排序
+
+        }
+        treeSet.clear();
+        //不可以对自定义类型进行排序,没有实现comparable接口
+        People people = new People(23);
+        People people1 = new People(26);
+        People people2 = new People(22);
+        TreeSet<People> treeSet1 = new TreeSet<>();
+        treeSet1.add(people);
+        treeSet1.add(people1);
+        treeSet1.add(people2);
+        for (People s : treeSet1) {
+            System.out.println(s);
+
+        }
+    }
+}
+class People implements Comparable<People>{
+    int age;
+
+    public People() {
+    }
+
+    public People(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "People{" +
+                "age=" + age +
+                '}';
+    }
+
+    @Override
+    public int compareTo(People o) {
+        return this.age - o.age;    //升序
+    }
+}
+```
+
+```java
+package com.iteator.map;
+
+import java.util.TreeSet;
+
+public class TreeSetTest02 {
+    public static void main(String[] args) {
+        TreeSet<Vip> treeSet = new TreeSet<>();
+        treeSet.add(new Vip("123",20));
+        treeSet.add(new Vip("555",21));
+        treeSet.add(new Vip("666",22));
+        treeSet.add(new Vip("1111",22));
+        treeSet.add(new Vip("11",19));
+        for (Vip o : treeSet) {
+            System.out.println(o);
+        }
+    }
+
+}
+class Vip implements Comparable<Vip>{
+    String name;
+    int age;
+
+    public Vip(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Vip{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    //排序规则
+    public int compareTo(Vip o) {
+        //年龄相等按名字排序
+        if (this.age == o.age) {
+            return this.name.compareTo(o.name);
+        } else {
+            //不一样按照年龄排
+            return this.age - o.age;
+        }
+    }
+}
+```
+
+![image-20230417204118649](java基础.assets/image-20230417204118649.png)
+
+
+
+```java
+package com.iteator.map;
+
+import java.util.Comparator;
+import java.util.TreeSet;
+
+public class TreeSetTest01 {
+    public static void main(String[] args) {
+        TreeSet<String> treeSet = new TreeSet<>();
+        treeSet.add("b");
+        treeSet.add("a");
+        treeSet.add("c");
+        treeSet.add("r");
+        treeSet.add("d");
+        for (String s : treeSet) {
+            System.out.println(s);  //字符串排序
+
+        }
+        treeSet.clear();
+        //不可以对自定义类型进行排序,没有实现comparable接口
+        People people = new People(23);
+        People people1 = new People(26);
+        People people2 = new People(22);
+        //TreeSet<People> treeSet1 = new TreeSet<>(new PeopleComparable());
+        //匿名内部类
+        TreeSet<People> treeSet1 = new TreeSet<>(new Comparator<People>() {
+            @Override
+            public int compare(People o1, People o2) {
+                return o1.age - o2.age;
+            }
+        });
+        treeSet1.add(people);
+        treeSet1.add(people1);
+        treeSet1.add(people2);
+        for (People s : treeSet1) {
+            System.out.println(s);
+
+        }
+    }
+}
+class People {
+    int age;
+
+    public People() {
+    }
+
+    public People(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "People{" +
+                "age=" + age +
+                '}';
+    }
+}
+//单独编写一个比较器
+//comparable是java.util.lang下的，comparator是java.util包下的
+/*class PeopleComparable implements Comparator<People> {
+
+    @Override
+    public int compare(People o1, People o2) {
+        return o1.age - o2.age;
+    }
+}*/
+```
+
+## 12 IO流
+
+### 四大家族
+
+java Io流这块有四大家族(他们都是抽象类)：
+java.io.Inputstream字节输入流
+java.io.outputstream 字节输出流
+
+java.io.Reader字符输入流
+java.io.Writer字符输出流
+注意：在java中只要类名以stream结尾的都是字节流。以Reader/writer结尾的都是字符流
+
+所有的流都实现了：java.io.Closeable接口，都是可关闭的，都有close（）方法。流毕竟是一个管道，这个是内存和硬盘之间的通道，用完之后一定要关闭，不然会耗费（占用）很多资源。养成好习惯，用完流一定要关闭。|
+
+所有的输出流都实现了：
+java.io.Flushable接口，都是可刷新的，都有flush（）方法。
+养成一个好习惯，输出流在最终输出之后，一定要记得flush（）刷新一下。这个刷新表示将通道/管道当中剩余未输出的数据强行输出完（清空管道！）刷新的作用就是清空管道。注意：如果没有flush（）可能会导致丢失数据。|
+
+![image-20230417213022945](java基础.assets/image-20230417213022945.png)
+
+### FileInputStream
+
+![image-20230418080602769](java基础.assets/image-20230418080602769.png)
+
+![image-20230418080727397](java基础.assets/image-20230418080727397.png)
+
+![image-20230418082127338](java基础.assets/image-20230418082127338.png)
+
+```java
+package com.io;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class FileInputStreamTest02 {
+    public static void main(String[] args) {
+        FileInputStream fileInputStream = null;
+        try {
+            //工程project的根为idea默认文件
+            fileInputStream = new FileInputStream("src//com//io//111.txt");
+            byte b[] = new byte[4]; //一次读取四个字节
+            /*int readCount = fileInputStream.read(b);    //返回四,再调方法时4个数组满了，重新来覆盖
+            System.out.println(new String(b,0,readCount));  //读到多少就打印多少
+            readCount = fileInputStream.read(b);
+            System.out.println(new String(b,0,readCount));
+            readCount = fileInputStream.read(b);
+            System.out.println(new String(b,0,readCount));*/
+            /*while(true) {
+                int readCount = fileInputStream.read(b);
+                if (readCount == -1) {
+                    break;
+                }
+                System.out.println(new String(b,0,readCount));
+            }*/
+            int readCount = 0;
+            while ((readCount = fileInputStream.read(b)) != -1) {
+                System.out.println(new String(b,0,readCount));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+```
+
+### FileOutputStream
+
+```java
+package com.io;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+public class FileOutPutStreamTest01 {
+    public static void main(String[] args) {
+        FileOutputStream fileOutputStream = null;
+        try {
+            //源文件清空重新写入/新建
+            //fileOutputStream = new FileOutputStream("111.txt");
+            //追加
+            fileOutputStream = new FileOutputStream("src//com//io//111.txt",true);
+            byte[] bytes = {97,98,99,100};
+            fileOutputStream.write(bytes);
+            fileOutputStream.write(bytes,0,4);
+            String s = "活塞环股份尼斯不和你";
+            byte[] bytes1 = s.getBytes(StandardCharsets.UTF_8);
+            fileOutputStream.write(bytes1);
+            fileOutputStream.flush();   //写完一定要刷新
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fileOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
+### BufferReader
+
+```java
+package com.io;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class BufferReaderTest01 {
+    public static void main(String[] args) {
+        FileReader fileReader = null;
+        BufferedReader br = null;
+        try {
+            fileReader = new FileReader("src//com//io//111.txt");
+            br =new BufferedReader(fileReader);
+           // System.out.println(br.readLine());
+            //读取一行,不带换行符
+            String s = null;
+            while ((s = br.readLine()) != null) {
+                System.out.println(s);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+```
+
+### BufferedWriter
+
+```java
+package com.io;
+
+import java.io.*;
+
+public class BufferdWriteTest01 {
+    public static void main(String[] args) {
+        BufferedWriter bufferedWriter = null;
+        try {
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("src//com//io//111.txt",true)));
+            bufferedWriter.write("nbswigisdigbn");
+            bufferedWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (bufferedWriter != null) {
+                try {
+                    bufferedWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+```
+
+### File
+
+![image-20230418110341955](java基础.assets/image-20230418110341955.png)
