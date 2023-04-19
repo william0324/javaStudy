@@ -2957,3 +2957,706 @@ public class BufferdWriteTest01 {
 ### File
 
 ![image-20230418110341955](java基础.assets/image-20230418110341955.png)
+
+https://blog.csdn.net/weixin_52533007/article/details/123274351
+
+
+
+目录拷贝
+
+### 文件路径
+
+文件在src类文件目录下才可以使用
+
+根路径默认在src
+
+![image-20230419125031423](java基础.assets/image-20230419125031423.png)
+
+![image-20230419130031704](java基础.assets/image-20230419130031704.png)
+
+### 资源绑定器
+
+![image-20230419130249791](java基础.assets/image-20230419130249791.png)
+
+### 序列化
+
+![image-20230418114325339](java基础.assets/image-20230418114325339.png)
+
+参与序列化与反序列化的
+
+对象必须实现`Serializable`接口,接口什么也没有，jvm会默认提供一个序列化版本号
+
+`transient`表示游离的，不参与序列化
+
+### IO和Properties联合使用
+
+![image-20230418132501116](java基础.assets/image-20230418132501116.png)
+
+![image-20230418132426533](java基础.assets/image-20230418132426533.png)
+
+### 多线程
+
+#### 实现
+
+第二种采用多
+
+```java
+package com.thread;
+//实现线程第一种方法
+/*
+编写一个类，直接继承java.lang.thread，重写run方法
+ */
+public class ThreadTest01 {
+    public static void main(String[] args) {
+        MyThread myThread = new MyThread();
+        myThread.start();   //在jvm开辟一个新的栈空间，代码任务瞬间就结束了。自动调用run方法
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("主线程--->"+i);
+        }
+    }
+}
+class MyThread extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("分支线程--->"+i);
+        }
+    }
+}
+```
+
+
+
+```java
+package com.thread;
+
+public class ThreadTest02 {
+    //第二种方式，编写一个类，实现java.lang.Runnable，实现run方法
+    public static void main(String[] args) {
+        MyRunnable myRunnable = new MyRunnable();
+        Thread t = new Thread(new MyRunnable());
+        t.start();
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("专线线程--->"+i);
+        }
+    }
+}
+class MyRunnable implements Runnable {
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("分支线程--->"+i);
+        }
+    }
+}
+```
+
+#### 线程生命周期
+
+#### 线程名字
+
+setName()
+
+getName()
+
+当线程没有命名，默认Thread-0，Thread-1，Thread-1....
+
+#### 获取当前线程
+
+``static Thread`currentThread()`  返回对当前正在执行的线程对象的引用。 
+
+#### 线程Sleep方法
+
+Thread.sleep(毫秒)
+
+面试
+
+不会
+
+![image-20230418160715144](java基础.assets/image-20230418160715144.png)
+
+#### 终止线程的睡眠
+
+t.interrupt();	//靠异常处理机制，报异常结束try catch
+
+终止一个线程的执行
+
+![image-20230418161519223](java基础.assets/image-20230418161519223.png)
+
+![image-20230418161555658](java基础.assets/image-20230418161555658.png)
+
+#### 线程优先级
+
+#### 线程合并
+
+#### *线程的安全*（重点）
+
+什么时候数据在多线程并发的环境下会存在安全问题呢?
+三个条件:
+条件1:多线程并发。
+条件2:有共享数据。
+条件3:共享数据有修改的行为。
+满足以上3个条件之后，就会存在线程安全问题。
+
+怎么解决线程安全问题呀?
+使用"线程同步机制”。
+
+异步编程模型:
+线程t1和线程t2，各自执行各自的，t1不管t2，t2不管t1，谁也不需要等谁,这种编程模型叫做:异步编程模型。其实就是:多线程并发(率较高。)
+同步编程模型:
+线程t1和线程t2，在线程t1执行的时候，必须等待t2线程执行结束，或者说在t2线程执行的时候，必须等待t1线程执行结束，两个线程之间发生了等待关系,这就是同步编程模型。效率较低。线程排队执行。
+
+有问题哦
+
+```java
+package com.thread;
+
+public class ThreadTest03 {
+    public static void main(String[] args) {
+        Account account = new Account("001",10000);
+        Thread thread = new AccountThread(account);
+        Thread thread1 = new AccountThread(account);
+        thread.setName("t1");
+        thread1.setName("t2");
+        thread.start();
+        thread1.start();
+
+    }
+}
+class Account {
+    private String number;//账号
+    private double balance;
+    public Account() {
+
+    }
+
+    public Account(String number, double balance) {
+        this.number = number;
+        this.balance = balance;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+    //取款
+    public void withDraw(double money) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        balance -= money;
+    }
+}
+class AccountThread extends Thread {
+    private Account act;
+
+    public AccountThread(Account act) {
+        this.act = act;
+    }
+
+    @Override
+    public void run() {
+        ///思考:t1执行到这里了，但还没有来得及执行这行代码，t2线程进来withdraw方法了。此时一定出问题。
+        String s = Thread.currentThread().getName();
+        System.out.println(s + "将要执行，账户"+act.getNumber()+"当前余额"+act.getBalance());
+        act.withDraw(1000.0);
+
+        System.out.println(s + "线程执行了，"+"账户"+act.getNumber()+"取款"+ 1000+"成功，余额" +act.getBalance());
+    }
+}
+```
+
+#### synchronized实现线程同步
+
+```java
+package com.thread;
+
+public class ThreadTest03 {
+    public static void main(String[] args) {
+        Account account = new Account("001",10000);
+        Thread thread = new AccountThread(account);
+        Thread thread1 = new AccountThread(account);
+        thread.setName("t1");
+        thread1.setName("t2");
+        thread.start();
+        thread1.start();
+
+    }
+}
+class Account {
+    private String number;//账号
+    private double balance;
+    public Account() {
+
+    }
+
+    public Account(String number, double balance) {
+        this.number = number;
+        this.balance = balance;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+    //取款
+    public void withDraw(double money) {
+        //小括号写你希望哪些线程同步，共享数据的对象
+        synchronized (this) {
+            balance -= money;
+        }
+    }
+}
+class AccountThread extends Thread {
+    private Account act;
+
+    public AccountThread(Account act) {
+        this.act = act;
+    }
+
+    @Override
+    public void run() {
+        ///思考:t1执行到这里了，但还没有来得及执行这行代码，t2线程进来withdraw方法了。此时一定出问题。
+        String s = Thread.currentThread().getName();
+        System.out.println(s + "将要执行，账户"+act.getNumber()+"当前余额"+act.getBalance());
+        act.withDraw(1000.0);
+
+        System.out.println(s + "线程执行了，"+"账户"+act.getNumber()+"取款"+ 1000+"成功，余额" +act.getBalance());
+    }
+}
+```
+
+synchronized有三种写法:
+第一种:同步代码块灵活
+synchronized(线程共享对象){
+同步代码块;
+}
+第二种:在实例方法上使用synchronized
+表示共享对象一定是this
+并且同步代码块是整个方法体。
+第三种:在静态方法上使用synchronized
+表示找类锁。
+类锁永远只有1把。
+就算创建了100个对象,那类锁也只有一把。对象锁:1个对象1把锁,100个对象100把锁。类锁:100个对象,也只是1把类锁。
+
+#### 死锁
+
+```java
+package com.thread;
+
+public class ThreadTest04 {
+    public static void main(String[] args) {
+        Object o1 = new Object();
+        Object o2 = new Object();
+        MyThread1 myThread1 = new MyThread1(o1,o2);
+        MyThread1 myThread2 = new MyThread1(o1,o2);
+    }
+}
+class MyThread1 extends Thread {
+    Object object1;
+    Object object2;
+
+    public MyThread1(Object object1, Object object2) {
+        this.object1 = object1;
+        this.object2 = object2;
+    }
+
+    @Override
+    public void run() {
+        //sisuo
+        synchronized (object1) {
+            synchronized (object2) {
+
+            }
+        }
+    }
+}
+class MyThread2 extends Thread {
+    Object object1;
+    Object object2;
+
+    public MyThread2(Object object1, Object object2) {
+        this.object1 = object1;
+        this.object2 = object2;
+    }
+
+    @Override
+    public void run() {
+        synchronized (object2) {
+            synchronized (object1) {
+
+            }
+        }
+    }
+}
+```
+
+聊一聊，我们以后开发中应该怎么解决线程安全问题?是一上来就选择线程同步吗?synchronized
+不是，synchronized会让程序的执行效率降低,用户体验不好。系统的用户吞吐量降低。用户体验差。在不得已的情况下再选择线程同步机制。
+第一种方案:尽量使用局部变量代替实例变量和静态变量。
+第二种方案:如果必须是实例变量，那么可以考虑创建多个对象，这样
+实例变量的内存就不共享了。(一个线程对应1个对象，100个线程对应100个对象，对象不共享，就没有数据安全问题了。)
+第三种方案:如果不能使用局部变量，对象也不能创建多个，这个时候就只能选择synchronized 了。线程同步机制。
+
+#### 守护线程
+
+
+java语言中线程分为两大类:
+一类是:用户线程
+一类是:守护线程(后台线程)
+其中具有代表性的就是:垃圾回收线程（守护线程)。守护线程的特点:
+一般守护线程是一个死循环，所有的用户线程只要结束，守护线程自动结束。
+注意:主线程main方法是一个用户线程。守护线程用在什么地方呢?
+每天00 :o0的时候系统数据自动备份。
+这个需要使用到定时器，并且我们可以将定时器设置为守护线程。一直在那里看着p没到00:00的时候就备份一次。所有的用户线程如果结束了，守护线程自动退出，没有必要进行数据备份了。
+
+```java
+package com.thread;
+
+public class ThreadTest05 {
+    public static void main(String[] args) {
+        Th th = new Th();
+        th.setName("后台线程");
+        th.setDaemon(true); //设置后台线程
+        th.start();
+        for (int i = 0; i < 10; i++) {
+            System.out.println(Thread.currentThread().getName() + "主线程进行");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+class Th extends Thread{
+    @Override
+    public void run() {
+        while (true) {
+            System.out.println(currentThread().getName() + "备份");
+        }
+    }
+}
+```
+
+#### 定时器
+
+定时器
+定时器的作用:
+间隔特定的时间，执行特定的程序。
+每周要进行银行账户的总账操作。每天要进行数据的备份操作。
+在实际的开发中，每隔多久执行一段特定的程序，这种需求是很常见的，那么在java中其实可以采用多种方式实现:
+可以使用sleep方法，睡眠，设置睡眠时间，没到这个时间点醒来，执行任务。这种方式是最原始的定时器。(比较low)
+在java的类库中已经写好了一个定时器:javautil.Timer，可以直接拿来用。不过，这种方式在目前的开发中也很少用因为现在有很多高级框架都是支持定时任务的。在实际的开发中，目前使用较多的是Spring框架中提供的springTask框架，这个框架只要进行简单的配置，就可以完成定时器的任务。
+
+```java
+package com.thread;
+
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class TimeTest {
+    public static void main(String[] args) {
+        Timer timer = new Timer();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date firstTime = simpleDateFormat.parse("2022-03-14 09:30:33");
+            timer.schedule(new LogTimeTask(),firstTime,1000*10);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+//定时任务类
+class LogTimeTask extends TimerTask {
+    @Override
+    public void run() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String strTime = simpleDateFormat.format(new Date());
+        System.out.println(strTime + "成功完成了一次数据备份");
+    }
+}
+```
+
+#### 实现线程的第三种方式 callable
+
+#### wait notify
+
+
+
+第一: wait和notify方法不是线程对象的方法，是java中任何一个java对象都有的方法，因为这两个方式是object类中自带的。
+wait方法和notify方法不是通过线程对象调用，
+不是这样的: t.wait()，也不是这样的: t.notify() ..不对。
+
+第二: wait()方法作用?
+object o = new Object() ;o.wait() ;
+表示:
+让正在o对象上活动的线程进入等待状态，无期限等待，直到被唤醒为止。
+o.wait();方法的调用,会让"当前线程（正在o对象上活动的线程)"进入等待状态。
+第三: notify()方法作用?
+object o = new Object() ;o . notify() ;
+表示:
+唤醒正在o对象上等待的线程。还有一个notifyAl1()方法:
+这个方法是唤醒o对象上处于等待的所有线程。
+
+![image-20230418201809459](java基础.assets/image-20230418201809459.png)
+
+### 反射机制
+
+反射机制有什么用?
+通过java语言中的反射机制可以操作字节码文件。优点类似于黑客。(可以读和修改字节码文件。>通过反射机制可以操作代码片段。(class文件。)
+反射机制的相关类在哪个包下?
+java . lang . reflect.* ;
+反射机制相关的重要的类有哪些?
+java. lang.class:代表整个字节码,代表一个类型
+java.lang.reflect.Method:代表字节码中的方法字节码。
+java.lang.reflect.Constructor:代表字节码中的构造方法字节码。java.lang.reflect.Field:代表字节码中的属性字节码。
+
+#### 获取class的三种方式
+
+##### 一、Class.forName()
+
+1、静态方法
+2．方法的参数是一个字符串。字符串需要的是一个完整类名。
+3、完整类名必须带有包名。java .iang包也不能省略。
+
+#### 二、getClass()
+
+java中任何一个对象都有一个方法: getClass()
+
+String s = "abc" ;
+class x = s.getclass(); // x代表string.class字节码文件，x代表string类型。System.out.println(c1 == x); // true ( ==判断的是对象的内存地址。)
+
+#### 三、java语言中任何一种类型，包括基本数据类型，它都有.class属性。
+
+Class z = String.class; i l z代表string类型
+Class k = Date.class; l l/ k代表Date类型
+class f = int.c1ass; l/于代表int类型
+Class e = double.class; l / e代表double类型
+
+#### 通过反射实例化对象
+
+```java
+package com.reflect;
+
+public class ReflectTest01 {
+    public static void main(String[] args) {
+        try {
+            Class c = Class.forName("com.reflect.User");
+            Object obj = c.newInstance();   //调用无参数构造方法
+            System.out.println(obj);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+```java
+package com.reflect;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
+
+public class ReflectTest02 {
+    public static void main(String[] args) {
+        FileReader fileReader = null;
+        try {
+            fileReader = new FileReader("src/com/reflect/classinfo.properties");
+            Properties properties = new Properties();
+            //加载
+            properties.load(fileReader);
+            //获取类名
+            String className = properties.getProperty("className");
+            System.out.println(className);
+            //反射机制实例化对象
+            Class c = Class.forName(className);
+            Object o = c.newInstance();
+            System.out.println(o);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } finally {
+            if (fileReader != null) {
+                try {
+                    fileReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+```
+
+#### 只让静态代码块执行，使用forname
+
+如果你只是希望一个类的静态代码块执行，其它代码一律不执行，你可以使用:
+Class.forName( "完整类名");
+这个方法的执行会导致类加载，类加载时，静态代码块执行。
+
+![image-20230419124042649](java基础.assets/image-20230419124042649.png)
+
+#### 获取field（重点）
+
+![image-20230419133320765](java基础.assets/image-20230419133320765.png)
+
+![image-20230419133351205](java基础.assets/image-20230419133351205.png)
+
+![image-20230419133445892](java基础.assets/image-20230419133445892.png)
+
+反编译
+
+![image-20230419133532748](java基础.assets/image-20230419133532748.png)
+
+属性赋值
+
+![image-20230419133820515](java基础.assets/image-20230419133820515.png)
+
+![image-20230419133939347](java基础.assets/image-20230419133939347.png)
+
+![image-20230419134119526](java基础.assets/image-20230419134119526.png)
+
+#### 可变长参数
+
+```java
+package com.reflect;
+
+public class ArgTest {
+    public static void main(String[] args) {
+    //参数个数为0·n个，只能在参数列表最后出现，并且只能有一个
+        m();
+        m(1,2,3);
+        m(1);
+        s(new String[] {"1","2"});
+        s("1","2");
+    }
+    public static void m(int... a) {
+
+    }
+    public static void s(String... s) {
+
+    }
+}
+```
+
+#### Method（重点）
+
+![image-20230419135819860](java基础.assets/image-20230419135819860.png)
+
+![image-20230419135945448](java基础.assets/image-20230419135945448.png)
+
+```java
+package com.reflect;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+//通过反射机制调用一个对象的方法
+/*
+1.对象
+2.方法名
+3.实参列表
+4.返回值
+ */
+public class ReflectTest03 {
+    public static void main(String[] args) {
+        //不使用反射机制
+        User user = new User();
+        boolean login = user.login("admin","123");
+        System.out.println(login?"登陆成功":"登陆失败");
+        //通过反射机制
+        try {
+            Class userClass = Class.forName("com.reflect.User");
+            Object obj = userClass.newInstance();
+            Method method = userClass.getDeclaredMethod("login",String.class,String.class);
+            //最重要
+            Object retValue = method.invoke(obj,"admin","123");
+            System.out.println(retValue);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+```
+
+#### 调用构造方法
+
+![image-20230419142855526](java基础.assets/image-20230419142855526.png)
+
+#### 获取父类和父类接口
+
+![image-20230419143119635](java基础.assets/image-20230419143119635.png)
+
+### 注解
+
+```java
+@Deprecated	//过时
+@Override//重写了父类
+```
+
+![image-20230419144907175](java基础.assets/image-20230419144907175.png)
+
+![image-20230419144921839](java基础.assets/image-20230419144921839.png)
+
+![image-20230419145142412](java基础.assets/image-20230419145142412.png)
+
+![image-20230419151447325](java基础.assets/image-20230419151447325.png)
+
+反射机制获取
+
+![image-20230419151521260](java基础.assets/image-20230419151521260.png)
+
+![image-20230419151558084](java基础.assets/image-20230419151558084.png)
